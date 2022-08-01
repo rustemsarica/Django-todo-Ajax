@@ -1,0 +1,36 @@
+{% extends "attendance/base_generic.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="container my-2">
+            {% crispy form %}
+        <div class="row">
+            {% if entries %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Date</th>
+                            <th>Working Hours</th>
+                            <th>Note</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordTable">
+                        {% for entry in entries %}
+                            <tr>
+                                <td>{{ entry.user }}</td>
+                                <td>{{ entry.day }}</td>
+                                <td>{{ entry.working_hours }}</td>
+                                <td>{{ entry.note }}</td>
+                                <td></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No entries</p>
+            {% endif %}
+        </div>
+    </div>
+    
+{% endblock content %}

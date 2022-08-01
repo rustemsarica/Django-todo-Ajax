@@ -1,0 +1,25 @@
+{% extends "attendance/base_generic.html" %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <h2 class="text-center">
+                Digital Transformation Intern Attendee
+            </h2>
+        </div>
+        <div class="row mt-4">
+            <div class="col text-center">
+                <a class="btn btn-primary" href="{% url 'newRecord' %}" role="button">
+                    New Record
+                </a>
+            </div>
+            <div class="col text-center">
+            <a class="btn btn-primary" href="{% url 'list' %}" role="button">
+                Attendee List
+            </a>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
