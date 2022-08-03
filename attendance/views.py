@@ -40,7 +40,7 @@ class AttendeeList(ListView, FormView):
         if end_day:
             entries = entries.filter(day__lte=end_day)
         if search:
-            entries = entries.filter(note__contains=search).values()
+            entries = entries.filter(note__contains=search)
         if not search and not user and not start_day and not end_day:
             entries = entries.all()
         entries = entries.order_by('-day')
