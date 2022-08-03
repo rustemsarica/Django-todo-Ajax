@@ -14,12 +14,18 @@ const saveEntry = function saveEntry(){
     let textareas = form.getElementsByTagName('textarea')
     let data = {}
     for(let i = 0; i < inputs.length; i++){
-        data[inputs[i].name] = inputs[i].value
+        if(inputs[i].type == 'radio'){
+            if(inputs[i].checked){
+                data[inputs[i].name] = inputs[i].value
+            }
+        }else{
+            data[inputs[i].name] = inputs[i].value;
+        }
     }
     for(let i = 0; i < textareas.length; i++){
         data[textareas[i].name] = textareas[i].value
     }
-
+    console.log(data)
     $.ajax({
         url: '/record/ajax/save',
         type: 'POST',
