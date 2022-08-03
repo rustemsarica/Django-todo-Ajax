@@ -19,4 +19,7 @@ class Entry(models.Model):
 
     def __str__(self):
         return self.user.__str__()
+    
+    def working_hours_str(self):
+        return str(self.working_hours) + ' Day'
 
