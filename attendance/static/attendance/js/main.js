@@ -236,6 +236,20 @@ const searchRecords = function searchRecords(){
         }
     })
 }
+
+var multipleSelect = function(){
+    $('.multipleSelect').select2({
+        tags: true,
+        placeholder: 'Select an option',
+        allowClear: true,
+        closeOnSelect: false,
+        width: '100%'
+        
+    }).on('change', function (e) { 
+        getStock(e);
+    }
+    );
+}
     
 
 $(document).ready(function(){
