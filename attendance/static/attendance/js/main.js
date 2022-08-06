@@ -202,8 +202,8 @@ $(document).ready(function(){
     if(searchForm){
         searchForm.addEventListener('change', searchRecords);
         $('#button-id-reset').click(function(){
-            $('.searcFormField').val(null).trigger('change');
-            //searchRecords();
+            $('.searcFormField').val(null);
+            searchRecords();
         }
         );
     }
