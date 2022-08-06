@@ -173,30 +173,6 @@ function send_alert(type, message){
     , 3000)
 }
 
-$.ajaxSetup({ 
-    beforeSend: function(xhr, settings) {
-        function getCookie(name) {
-            var cookieValue = null;
-            if (document.cookie && document.cookie != '') {
-                var cookies = document.cookie.split(';');
-                for (var i = 0; i < cookies.length; i++) {
-                    var cookie = jQuery.trim(cookies[i]);
-                    // Does this cookie string begin with the name we want?
-                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-            // Only send the token to relative URLs i.e. locally.
-            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-        }
-    } 
-});
-
 const removeRow = function removeRow(){
     let thisBtn = this
     let row = thisBtn.parentElement.parentElement
@@ -237,7 +213,7 @@ const searchRecords = function searchRecords(){
     })
 }
 
-var multipleSelect = function(){
+function multipleSelect(){
     $('.multipleSelect').select2({
         tags: true,
         placeholder: 'Select an option',
@@ -246,7 +222,7 @@ var multipleSelect = function(){
         width: '100%'
         
     }).on('change', function (e) { 
-        getStock(e);
+        //searchRecords();
     }
     );
 }
@@ -259,10 +235,57 @@ $(document).ready(function(){
         searchForm.addEventListener('submit', searchRecords)
         searchForm.addEventListener('reset', searchRecords)
         searchForm.addEventListener('change', searchRecords)
-        searchRecords();
+        //searchRecords();
     }
 
     $('input[name="removeRow"]').each(function(){
         $(this).click(removeRow)
     });
+    multipleSelect();
+});
+
+$(document).on('click', '.updateModalBtn', function(){
+    let id = $(this).data('id');
+    $.ajax({
+        url: '/record/ajax/update-form',
+        type: 'POST',
+        data: {
+            entry_id: id
+        },
+        success: function(response){
+            var input = '<input type="hidden" name="entry_id" value="'+id+'">';
+            $('#updateModalBody').html('');
+            $('#updateModalBody').html(response['form']);
+            $('#updateModalBody').children().first().prepend(input);
+        }
+    })
+});
+
+$(document).on('click', '.deleteModalBtn', function(){
+    let id = $(this).data('id');
+    $('#deleteId').val(id);
+});
+
+$.ajaxSetup({ 
+    beforeSend: function(xhr, settings) {
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+            // Only send the token to relative URLs i.e. locally.
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        }
+    } 
 });

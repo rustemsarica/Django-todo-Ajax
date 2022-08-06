@@ -6,7 +6,7 @@ from django.views.generic.list import View
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, JsonResponse
-from .forms import AttendeeListSearchForm, NewRecordForm
+from .forms import AttendeeListSearchForm, NewRecordForm, ModalForm
 from .models import Entry
 from django.template.context_processors import csrf
 from crispy_forms.utils import render_crispy_form
@@ -22,7 +22,7 @@ class AttendeeList(ListView, FormView):
     form_class = AttendeeListSearchForm
 
     def get(self, request):
-        entries = Entry.objects.all().order_by('-day')
+        entries = Entry.objects.filter(deleted=False).order_by('-day')
         return render(request, self.template_name, {'form': self.form_class, 'entries': entries})
 
     def searchRecord(request):
@@ -31,7 +31,7 @@ class AttendeeList(ListView, FormView):
         start_day = request.GET.get('start_day' or None)
         end_day = request.GET.get('end_day' or None)
 
-        entries = Entry.objects
+        entries = Entry.objects.filter(deleted=False)
 
         if user:
             entries = entries.filter(user=user)
@@ -46,44 +46,6 @@ class AttendeeList(ListView, FormView):
         entries = entries.order_by('-day')
         list_result = list(entries.values('id','user', 'user__username', 'note', 'day', 'working_hours'))
         return JsonResponse(list_result, safe=False)
-
-
-class LoginPage(View):
-
-    def get(self, request):
-        template_name = 'attendance/login.html'
-        return render(request, template_name=template_name)
-
-    def post(self, request):
-
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
-
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-                return HttpResponseRedirect('/')
-            else:
-                context = {'message': 'Inactive User'}
-                return render(request, "attendance/login.html", context)
-        else:
-            context = {'message': 'Not a user'}
-            return render(request, "attendance/login.html", context)
-
-
-class LogoutView(View):
-
-    def get(self, request):
-        logout(request)
-        return render(request, "attendance/login.html")
-
-
-class IndexView(View):
-
-    def get(self, request):
-        template_name = 'attendance/index.html'
-        return render(request, template_name=template_name)
 
 
 class NewRecordView(FormView):
@@ -147,9 +109,81 @@ class NewRecordView(FormView):
             entry.delete()
             return JsonResponse({'success': 'true'})
 
-
     def get(self, request):
         form = NewRecordForm
         return render(request, self.template_name, {'form': form})
 
+    def update(request):
+        entry = Entry.objects.get(id=request.POST['entry_id'])
+        if str(entry.day) == str(request.POST['day']):
+            form = NewRecordForm(request.POST, instance=entry)
+            form.user = request.user
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect('/list')
+            return JsonResponse({'success': False, 'message': 'Form is not valid'})
+        else:
+            record=Entry.objects.filter(day=request.POST['day'], user=request.user).count()
+            if record>0:
+                return JsonResponse({'error': 'true', 'message': 'You have already entered a record for this day'})
+            else:
+                form = NewRecordForm(request.POST, instance=entry)
+                if form.is_valid():
+                    form.save()
+                    return HttpResponseRedirect('/list')
+            return JsonResponse({'success': False, 'message': 'Form is not valid'})
+    
+    def delete(request):
+        entry = Entry.objects.get(id=request.POST['entry_id'])
+        entry.deleted = True
+        entry.save()
+        return HttpResponseRedirect('/list')
+
+def getUpdateForm(request):
+    if request.method == 'POST':
+        entry_id = request.POST['entry_id']
+        entry = Entry.objects.get(id=entry_id)
+        form = ModalForm(instance=entry)
+        ctx = {}
+        ctx.update(csrf(request))
+        form_html = render_crispy_form(form, context=ctx)
+        return JsonResponse({'form': form_html})
+
+
+class LoginPage(View):
+
+    def get(self, request):
+        template_name = 'attendance/login.html'
+        return render(request, template_name=template_name)
+
+    def post(self, request):
+
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return HttpResponseRedirect('/')
+            else:
+                context = {'message': 'Inactive User'}
+                return render(request, "attendance/login.html", context)
+        else:
+            context = {'message': 'Not a user'}
+            return render(request, "attendance/login.html", context)
+
+
+class LogoutView(View):
+
+    def get(self, request):
+        logout(request)
+        return render(request, "attendance/login.html")
+
+
+class IndexView(View):
+
+    def get(self, request):
+        template_name = 'attendance/index.html'
+        return render(request, template_name=template_name)
     

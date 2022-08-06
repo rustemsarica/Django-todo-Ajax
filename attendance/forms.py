@@ -1,4 +1,6 @@
 from cProfile import label
+from datetime import datetime
+from logging import PlaceHolder
 from crispy_forms.bootstrap import InlineRadios
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, Submit, Div, Row, Button, Reset
@@ -35,8 +37,8 @@ class AttendeeListSearchForm(forms.Form):
             Row(
                 Field('start_day', wrapper_class="col-md-2"),
                 Field('end_day', wrapper_class="col-md-2"),
-                Field('user', wrapper_class="col-md-2"),
-                Field('search', wrapper_class="col-md-4"),
+                Field('user', wrapper_class="col-md-4", css_class="multipleSelect form-control"),
+                Field('search', wrapper_class="col-md-2"),
                 Div(
                     Button('button', 'Search', css_class="btn btn-primary"),
                     Reset('reset', 'Reset', css_class="btn-outline-dark"),
@@ -47,7 +49,7 @@ class AttendeeListSearchForm(forms.Form):
 
     start_day = forms.DateField(widget=DateInput(), required=False)
     end_day = forms.DateField(widget=DateInput(), required=False)
-    user = forms.ModelChoiceField(queryset=User.objects.all(), required=False)
+    user = forms.ModelMultipleChoiceField(queryset=User.objects.all(), required=False)
     search = forms.CharField(max_length=100, required=False)
 
 class NewRecordForm(forms.ModelForm):
@@ -85,4 +87,36 @@ class NewRecordForm(forms.ModelForm):
         }
 
 
-NewRecordFormset = modelformset_factory(Entry, form=NewRecordForm, extra=1)
+class ModalForm(forms.ModelForm):
+    
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.helper = FormHelper()
+            self.helper.form_tag = True
+            self.helper.form_action = 'record/update'
+            self.helper.form_id = 'modal-form'
+            self.helper.layout = Layout(
+                Row(
+                    Field('day'),
+                    InlineRadios('working_hours'),
+                    Field('note'),
+                    Div(
+                        Button('button', 'Cancel', css_class="btn-outline-secondary", data_bs_dismiss="modal"),
+                        Submit('submit', 'Save', css_class="recordSaveBtn btn-primary"),
+                        css_class="modal-footer",
+                    ),
+                    css_id='recordRow',
+                    css_class='recordRow'
+                )
+            )
+    
+        class Meta:
+            model = Entry
+            fields = ['day', 'working_hours', 'note']
+            exclude = ['user']
+            widgets = {
+                'day': DateInput,
+                'note': forms.Textarea(attrs={'rows': 1, 'cols': 40}),
+                'user': forms.HiddenInput(),
+                'working_hours': forms.RadioSelect(),
+            }

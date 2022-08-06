@@ -2,7 +2,7 @@ from django.urls import path
 from .views import AttendeeList
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.models import User
-from .views import LoginPage, LogoutView, IndexView, NewRecordView
+from .views import LoginPage, LogoutView, IndexView, NewRecordView, getUpdateForm
 
 
 urlpatterns = [
@@ -11,10 +11,13 @@ urlpatterns = [
     path('login/', LoginPage.as_view(), name='login'),
     path('user/logout', LogoutView.as_view(), name='logout'),
     path('record/add', NewRecordView.as_view(), name='newRecord'),
-    path('record/ajax/add-record-row', NewRecordView.getForm, name='addRecordRow'),
-    path('record/ajax/save', NewRecordView.saveRecord, name='saveRecord'),
-    path('record/ajax/delete', NewRecordView.deleteRecord, name='deleteRecord'),
-    path('record/ajax/update', NewRecordView.updateRecord, name='updateRecord'),
-    path('list/ajax/search', AttendeeList.searchRecord, name='searchRecord'),
+    path('record/update', NewRecordView.update, name='updateRecord'),
+    path('record/delete', NewRecordView.delete, name='deleteRecord'),
+    path('record/ajax/add-record-row', NewRecordView.getForm),
+    path('record/ajax/save', NewRecordView.saveRecord),
+    path('record/ajax/delete', NewRecordView.deleteRecord),
+    path('record/ajax/update', NewRecordView.updateRecord),
+    path('list/ajax/search', AttendeeList.searchRecord),
+    path('record/ajax/update-form', getUpdateForm),
 
 ]

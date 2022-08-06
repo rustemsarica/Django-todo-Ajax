@@ -16,6 +16,7 @@ class Entry(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     note = models.TextField(max_length=500)
     day = models.DateField(default=timezone.now)
+    deleted = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.__str__()
