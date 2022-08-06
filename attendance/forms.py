@@ -23,7 +23,7 @@ class AttendeeForm(forms.Form):
 
 
 class AttendeeListAdminSearchForm(forms.Form):
-
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
@@ -46,7 +46,6 @@ class AttendeeListAdminSearchForm(forms.Form):
                 ),
             )
         )
-
     start_day = forms.DateField(widget=DateInput(), required=False)
     end_day = forms.DateField(widget=DateInput(), required=False)
     user = forms.ModelMultipleChoiceField(queryset=User.objects.all(), required=False)

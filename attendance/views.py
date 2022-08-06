@@ -20,12 +20,13 @@ class AttendeeList(ListView, FormView):
     form_class = AttendeeListSearchForm
 
     def get(self, request):
+        
+        entries = Entry.objects.filter(deleted=False)
+
         start_day = request.GET.get('start_day' or None)
         end_day = request.GET.get('end_day' or None)
         user = request.GET.getlist('user' or None)
         note = request.GET.get('note' or None)
-        
-        entries = Entry.objects.filter(deleted=False)
         if request.user.is_superuser:
             form = AttendeeListAdminSearchForm(request.GET)
             if user:
