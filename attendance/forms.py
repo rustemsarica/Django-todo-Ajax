@@ -22,7 +22,7 @@ class AttendeeForm(forms.Form):
     date = forms.DateField()
 
 
-class AttendeeListSearchForm(forms.Form):
+class AttendeeListAdminSearchForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -50,6 +50,34 @@ class AttendeeListSearchForm(forms.Form):
     start_day = forms.DateField(widget=DateInput(), required=False)
     end_day = forms.DateField(widget=DateInput(), required=False)
     user = forms.ModelMultipleChoiceField(queryset=User.objects.all(), required=False)
+    note = forms.CharField(max_length=100, required=False)
+
+class AttendeeListSearchForm(forms.Form):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = True
+        self.helper.form_class = 'form-inline'
+        self.helper.form_method = 'get'
+        self.helper.form_id = 'searchForm'
+        self.helper.form_action = '/list'
+        self.helper.form_show_labels = False
+        self.helper.layout = Layout(
+            Row(
+                Field('start_day', wrapper_class="col-md-2"),
+                Field('end_day', wrapper_class="col-md-2"),
+                Field('note', placeholder='Search in notes', wrapper_class="col-md-3"),
+                Div(
+                    Submit('search', 'Search', css_class="btn btn-primary"),
+                    Reset('reset', 'Reset', css_class="btn-outline-dark"),
+                    css_class="col-md-2"
+                ),
+            )
+        )
+
+    start_day = forms.DateField(widget=DateInput(), required=False)
+    end_day = forms.DateField(widget=DateInput(), required=False)
     note = forms.CharField(max_length=100, required=False)
 
 class NewRecordForm(forms.ModelForm):

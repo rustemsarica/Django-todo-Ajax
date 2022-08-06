@@ -6,7 +6,7 @@ from django.views.generic.list import View
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, JsonResponse
-from .forms import AttendeeListSearchForm, NewRecordForm, ModalForm
+from .forms import AttendeeListSearchForm, AttendeeListAdminSearchForm, NewRecordForm, ModalForm
 from .models import Entry
 from django.template.context_processors import csrf
 from crispy_forms.utils import render_crispy_form
@@ -22,15 +22,20 @@ class AttendeeList(ListView, FormView):
     form_class = AttendeeListSearchForm
 
     def get(self, request):
-        note = request.GET.get('note' or None)
-        user = request.GET.get('user' or None)
         start_day = request.GET.get('start_day' or None)
         end_day = request.GET.get('end_day' or None)
-
+        user = request.GET.getlist('user' or None)
+        note = request.GET.get('note' or None)
+        
         entries = Entry.objects.filter(deleted=False)
+        if request.user.is_superuser:
+            form = AttendeeListAdminSearchForm(request.GET)
+            if user:
+                entries = entries.filter(user__in=user)
+        else:
+            form = AttendeeListSearchForm(request.GET)
+            entries = entries.filter(user=request.user)
 
-        if user:
-            entries = entries.filter(user=user)
         if start_day:
             entries = entries.filter(day__gte=start_day)
         if end_day:
@@ -39,7 +44,7 @@ class AttendeeList(ListView, FormView):
             entries = entries.filter(note__contains=note)
         
         entries = entries.order_by('-day')
-        return render(request, self.template_name, {'form':AttendeeListSearchForm(request.GET), 'entries': entries})
+        return render(request, self.template_name, {'form':form, 'entries': entries})
 
     def searchRecord(request):
         search = request.GET.get('search' or None)
