@@ -3,6 +3,8 @@
 {% block content %}
     <div class="container my-2">
         {% crispy form %}
+        <div class="alert" style="display:none;"></div>
+
         <div class="row">
             {% if entries %}
                 <table class="table table-hover">
@@ -48,9 +50,9 @@
             </div>
           </div>
         </div>
-      </div>
+    </div>
 
-      <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -69,6 +71,21 @@
             </form>
           </div>
         </div>
-      </div>
+    </div>
+
+    {% if messages %}
+        <script>
+            $(document).ready(function(){
+                $('.alert').show();
+                {% for message in messages %}
+                    $('.alert').addClass('alert-{{ message.tags }}');
+                    $('.alert').html('{{ message }}');
+                    $('.alert').delay(3000).fadeOut(function(){
+                        $('.alert').removeClass('alert-{{ message.tags }}');
+                    });
+                {% endfor %}
+            });
+        </script>
+    {% endif %}
     
 {% endblock content %}

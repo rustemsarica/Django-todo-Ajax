@@ -10,9 +10,7 @@ from .forms import AttendeeListSearchForm, AttendeeListAdminSearchForm, NewRecor
 from .models import Entry
 from django.template.context_processors import csrf
 from crispy_forms.utils import render_crispy_form
-from django.core import serializers
-from django.db.models import Q, F
-
+from django.contrib import messages
 
 # Create your views here.
 
@@ -142,23 +140,30 @@ class NewRecordView(FormView):
             form.user = request.user
             if form.is_valid():
                 form.save()
-                return HttpResponseRedirect('/list')
-            return JsonResponse({'success': False, 'message': 'Form is not valid'})
+                messages.add_message(request, messages.SUCCESS, 'Record updated successfully')
+            else:
+                messages.add_message(request, messages.ERROR, 'Form is not valid')
         else:
             record=Entry.objects.filter(day=request.POST['day'], user=request.user, deleted=False).count()
             if record>0:
-                return JsonResponse({'error': 'true', 'message': 'You have already entered a record for this day'})
+                messages.add_message(request, messages.ERROR, 'You have already entered a record for this day')
             else:
                 form = NewRecordForm(request.POST, instance=entry)
                 if form.is_valid():
                     form.save()
-                    return HttpResponseRedirect('/list')
-            return JsonResponse({'success': False, 'message': 'Form is not valid'})
+                    messages.add_message(request, messages.SUCCESS, 'Record updated successfully')
+                else:
+                    messages.add_message(request, messages.ERROR, 'Form is not valid')
+        return HttpResponseRedirect('/list')
     
     def delete(request):
         entry = Entry.objects.get(id=request.POST['entry_id'])
-        entry.deleted = True
-        entry.save()
+        if entry:
+            entry.deleted = True
+            entry.save()
+            messages.add_message(request, messages.SUCCESS, 'Record deleted successfully')
+        else:
+            messages.add_message(request, messages.ERROR, 'Entry not found')
         return HttpResponseRedirect('/list')
 
 def getUpdateForm(request):
