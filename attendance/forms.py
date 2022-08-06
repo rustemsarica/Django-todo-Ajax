@@ -23,7 +23,7 @@ class AttendeeForm(forms.Form):
 
 
 class AttendeeListAdminSearchForm(forms.Form):
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
@@ -35,14 +35,14 @@ class AttendeeListAdminSearchForm(forms.Form):
         self.helper.form_show_labels = False
         self.helper.layout = Layout(
             Row(
-                Field('start_day', wrapper_class="col-md-2"),
-                Field('end_day', wrapper_class="col-md-2"),
-                Field('user', wrapper_class="col-md-3", css_class="multipleSelect form-control"),
-                Field('note', placeholder='Search in notes', wrapper_class="col-md-3"),
+                Field('start_day', wrapper_class="col-lg-2 col-md-3", css_class="searcFormField"),
+                Field('end_day', wrapper_class="col-lg-2 col-md-3", css_class="searcFormField"),
+                Field('user', wrapper_class="col-md-3", css_class="multipleSelect form-control searcFormField"),
+                Field('note', placeholder='Search in notes', wrapper_class="col-md-3", css_class="searcFormField"),
                 Div(
                     Submit('search', 'Search', css_class="btn btn-primary"),
-                    Reset('reset', 'Reset', css_class="btn-outline-dark"),
-                    css_class="col-md-2"
+                    Button('reset', 'Reset', css_class="btn-outline-dark"),
+                    css_class="col-lg-2 col-12"
                 ),
             )
         )

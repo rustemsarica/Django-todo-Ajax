@@ -4,8 +4,6 @@ const newRowContainer = document.getElementById('newRowContainer');
 let recordSaveBtn = document.getElementsByClassName('recordSaveBtn');
 let removeRowBtn = document.getElementsByClassName('removeRowBtn')
 const searchForm = document.getElementById('searchForm');
-const searchInput = document.getElementById('id_search');
-const recordTable = document.getElementById('recordTable');
 
 const saveEntry = function saveEntry(){
     let thisBtn = this
@@ -202,7 +200,12 @@ function multipleSelect(){
 $(document).ready(function(){
 
     if(searchForm){
-        searchForm.addEventListener('change', searchRecords)
+        searchForm.addEventListener('change', searchRecords);
+        $('#button-id-reset').click(function(){
+            $('.searcFormField').val(null).trigger('change');
+            //searchRecords();
+        }
+        );
     }
 
     $('input[name="removeRow"]').each(function(){
