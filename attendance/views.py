@@ -22,8 +22,24 @@ class AttendeeList(ListView, FormView):
     form_class = AttendeeListSearchForm
 
     def get(self, request):
-        entries = Entry.objects.filter(deleted=False).order_by('-day')
-        return render(request, self.template_name, {'form': self.form_class, 'entries': entries})
+        note = request.GET.get('note' or None)
+        user = request.GET.get('user' or None)
+        start_day = request.GET.get('start_day' or None)
+        end_day = request.GET.get('end_day' or None)
+
+        entries = Entry.objects.filter(deleted=False)
+
+        if user:
+            entries = entries.filter(user=user)
+        if start_day:
+            entries = entries.filter(day__gte=start_day)
+        if end_day:
+            entries = entries.filter(day__lte=end_day)
+        if note:
+            entries = entries.filter(note__contains=note)
+        
+        entries = entries.order_by('-day')
+        return render(request, self.template_name, {'form':AttendeeListSearchForm(request.GET), 'entries': entries})
 
     def searchRecord(request):
         search = request.GET.get('search' or None)
@@ -44,8 +60,9 @@ class AttendeeList(ListView, FormView):
         if not search and not user and not start_day and not end_day:
             entries = entries.all()
         entries = entries.order_by('-day')
-        list_result = list(entries.values('id','user', 'user__username', 'note', 'day', 'working_hours'))
-        return JsonResponse(list_result, safe=False)
+        return render(request, 'attendance/entry_list.html', {'form': AttendeeListSearchForm(instance=request.GET), 'entries': entries})
+        #list_result = list(entries.values('id','user', 'user__username', 'note', 'day', 'working_hours'))
+        #return JsonResponse(list_result, safe=False)
 
 
 class NewRecordView(FormView):
@@ -75,7 +92,7 @@ class NewRecordView(FormView):
             form = NewRecordForm(request.POST)
             if form.is_valid():
                 day = request.POST['day']
-                record=Entry.objects.filter(day=day, user=request.user)
+                record=Entry.objects.filter(day=day, user=request.user, deleted=False)
                 if record.count()>0:
                     return JsonResponse({'error': 'true', 'message': 'You have already entered a record for this day'})
                 else:
@@ -92,7 +109,7 @@ class NewRecordView(FormView):
             entry = Entry.objects.get(id=entry_id)
             day = request.POST['day']
             user = request.POST['user']
-            record=Entry.objects.filter(day=day, user=user).count()
+            record=Entry.objects.filter(day=day, user=user, deleted=False).count()
             if record>0:
                 return JsonResponse({'error': 'true', 'message': 'You have already entered a record for this day'})
             else:
@@ -123,7 +140,7 @@ class NewRecordView(FormView):
                 return HttpResponseRedirect('/list')
             return JsonResponse({'success': False, 'message': 'Form is not valid'})
         else:
-            record=Entry.objects.filter(day=request.POST['day'], user=request.user).count()
+            record=Entry.objects.filter(day=request.POST['day'], user=request.user, deleted=False).count()
             if record>0:
                 return JsonResponse({'error': 'true', 'message': 'You have already entered a record for this day'})
             else:

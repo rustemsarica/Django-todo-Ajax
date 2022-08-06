@@ -3,7 +3,7 @@ let recordRowCount = document.getElementsByClassName('recordRow').length;
 const newRowContainer = document.getElementById('newRowContainer');
 let recordSaveBtn = document.getElementsByClassName('recordSaveBtn');
 let removeRowBtn = document.getElementsByClassName('removeRowBtn')
-const searchForm = document.getElementById('list_search_form');
+const searchForm = document.getElementById('searchForm');
 const searchInput = document.getElementById('id_search');
 const recordTable = document.getElementById('recordTable');
 
@@ -181,36 +181,7 @@ const removeRow = function removeRow(){
 }
 
 const searchRecords = function searchRecords(){
-    let inputs = searchForm.getElementsByTagName('input')
-    let selects = searchForm.getElementsByTagName('select')
-    let data = {}
-
-    for(let i = 0; i < inputs.length; i++){
-        data[inputs[i].name] = inputs[i].value
-    }
-    for(let i = 0; i < selects.length; i++){
-        data[selects[i].name] = selects[i].value
-    }
-            
-    $.ajax({
-        url: '/list/ajax/search',
-        type: 'GET',
-        data: data,
-        dataType: 'json',
-        success: function(data){
-            let html = ''
-            for(let i = 0; i < data.length; i++){
-                html += '<tr>'
-                html += '<td>'+data[i].user__username+'</td>'
-                html += '<td>'+data[i].day+'</td>'
-                html += '<td>'+data[i].working_hours+'</td>'
-                html += '<td>'+data[i].note+'</td>'
-                html += '<td></td>'
-                html += '</tr>'
-            }
-            recordTable.innerHTML = html
-        }
-    })
+    searchForm.submit();
 }
 
 function multipleSelect(){
@@ -222,7 +193,7 @@ function multipleSelect(){
         width: '100%'
         
     }).on('change', function (e) { 
-        //searchRecords();
+        searchRecords();
     }
     );
 }
@@ -231,11 +202,7 @@ function multipleSelect(){
 $(document).ready(function(){
 
     if(searchForm){
-        searchInput.addEventListener('keyup', searchRecords)
-        searchForm.addEventListener('submit', searchRecords)
-        searchForm.addEventListener('reset', searchRecords)
         searchForm.addEventListener('change', searchRecords)
-        //searchRecords();
     }
 
     $('input[name="removeRow"]').each(function(){

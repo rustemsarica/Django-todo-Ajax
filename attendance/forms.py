@@ -30,17 +30,17 @@ class AttendeeListSearchForm(forms.Form):
         self.helper.form_tag = True
         self.helper.form_class = 'form-inline'
         self.helper.form_method = 'get'
-        self.helper.form_id = 'list_search_form'
+        self.helper.form_id = 'searchForm'
+        self.helper.form_action = '/list'
         self.helper.form_show_labels = False
-        self.helper.html5_required = False
         self.helper.layout = Layout(
             Row(
                 Field('start_day', wrapper_class="col-md-2"),
                 Field('end_day', wrapper_class="col-md-2"),
-                Field('user', wrapper_class="col-md-4", css_class="multipleSelect form-control"),
-                Field('search', wrapper_class="col-md-2"),
+                Field('user', wrapper_class="col-md-3", css_class="multipleSelect form-control"),
+                Field('note', placeholder='Search in notes', wrapper_class="col-md-3"),
                 Div(
-                    Button('button', 'Search', css_class="btn btn-primary"),
+                    Submit('search', 'Search', css_class="btn btn-primary"),
                     Reset('reset', 'Reset', css_class="btn-outline-dark"),
                     css_class="col-md-2"
                 ),
@@ -50,7 +50,7 @@ class AttendeeListSearchForm(forms.Form):
     start_day = forms.DateField(widget=DateInput(), required=False)
     end_day = forms.DateField(widget=DateInput(), required=False)
     user = forms.ModelMultipleChoiceField(queryset=User.objects.all(), required=False)
-    search = forms.CharField(max_length=100, required=False)
+    note = forms.CharField(max_length=100, required=False)
 
 class NewRecordForm(forms.ModelForm):
 

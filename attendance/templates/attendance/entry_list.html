@@ -18,11 +18,11 @@
                     <tbody id="recordTable">
                         {% for entry in entries %}
                             <tr>
-                                <td>{{ entry.user }}</td>
-                                <td>{{ entry.day }}</td>
-                                <td>{{ entry.working_hours }}</td>
-                                <td>{{ entry.note }}</td>
-                                <td>
+                                <td class="col-md-2">{{ entry.user__fullname }}</td>
+                                <td class="col-md-2">{{ entry.day }}</td>
+                                <td class="col-md-2">{{ entry.working_hours }}</td>
+                                <td class="col-md-4">{{ entry.note }}</td>
+                                <td class="col-md-2">
                                     <button type="button" class="btn btn-primary updateModalBtn" data-id="{{entry.id}}" data-bs-toggle="modal" data-bs-target="#updateModal">Update</button>
                                     <button type="button" class="btn btn-danger deleteModalBtn" data-id="{{entry.id}}" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
                                 </td>

@@ -23,4 +23,14 @@ class Entry(models.Model):
     
     def working_hours_str(self):
         return str(self.working_hours) + ' Day'
+    
+    def user__fullname(self):
+        return self.user.get_full_name()
+    
+    def user__username(self):
+        return self.user.username
+    
+    def user__email(self):
+        return self.user.email
+    
 
