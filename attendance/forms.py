@@ -7,8 +7,7 @@ from crispy_forms.layout import Layout, Field, Submit, Div, Row, Button, Reset
 from django import forms
 from django.contrib.auth.models import User
 from .models import Entry
-from django.forms import modelformset_factory
-
+from dateutil.relativedelta import relativedelta
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -46,6 +45,7 @@ class AttendeeListAdminSearchForm(forms.Form):
                 ),
             )
         )
+    
     start_day = forms.DateField(widget=DateInput(), required=False)
     end_day = forms.DateField(widget=DateInput(), required=False)
     user = forms.ModelMultipleChoiceField(queryset=User.objects.all(), required=False)
@@ -88,7 +88,7 @@ class NewRecordForm(forms.ModelForm):
         self.helper.form_id = 'new-record-form'
         self.helper.layout = Layout(
             Row(
-                Field('day', wrapper_class="col-3"),
+                Field('day', wrapper_class="col-3", max=last_day_of_month()),
                 InlineRadios('working_hours', wrapper_class="col-3"),
                 Field('note', wrapper_class="col-4"),
                 Div(
@@ -147,3 +147,8 @@ class ModalForm(forms.ModelForm):
                 'user': forms.HiddenInput(),
                 'working_hours': forms.RadioSelect(),
             }
+
+def last_day_of_month():
+        today = datetime.now()
+        last_day = datetime(today.year, today.month, 1) + relativedelta(months=1) - relativedelta(days=1)
+        return last_day.strftime('%Y-%m-%d')
