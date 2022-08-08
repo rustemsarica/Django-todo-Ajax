@@ -37,6 +37,7 @@ class Entry(models.Model):
         entry = Entry.objects.filter(user=self.user, day=self.day, deleted=False)
         if not entry:
             super().save()
+            return True
         else:
             return False
         
