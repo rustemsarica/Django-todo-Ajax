@@ -45,6 +45,10 @@ class Entry(models.Model):
         self.deleted = True
         super().save()
         return self.deleted
+
+    def super_delete(self):
+        super().delete()
+        return True
         
             
 
