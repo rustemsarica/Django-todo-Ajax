@@ -23,7 +23,7 @@ const saveEntry = function saveEntry(){
     for(let i = 0; i < textareas.length; i++){
         data[textareas[i].name] = textareas[i].value
     }
-    console.log(data)
+    
     $.ajax({
         url: '/record/ajax/save',
         type: 'POST',

@@ -47,14 +47,14 @@ class AttendeeList(ListView, FormView):
 
     def searchRecord(request):
         search = request.GET.get('search' or None)
-        user = request.GET.get('user' or None)
+        user = request.GET.getlist('user' or None)
         start_day = request.GET.get('start_day' or None)
         end_day = request.GET.get('end_day' or None)
 
         entries = Entry.objects.filter(deleted=False)
 
         if user:
-            entries = entries.filter(user=user)
+            entries = entries.filter(user__in=user)
         if start_day:
             entries = entries.filter(day__gte=start_day)
         if end_day:
@@ -95,15 +95,12 @@ class NewRecordView(FormView):
         if request.method == 'POST':
             form = NewRecordForm(request.POST)
             if form.is_valid():
-                day = request.POST['day']
-                record=Entry.objects.filter(day=day, user=request.user, deleted=False)
-                if record.count()>0:
-                    return JsonResponse({'error': 'true', 'message': 'You have already entered a record for this day'})
-                else:
-                    entry = form.save(commit=False)
-                    entry.user = request.user
-                    entry.save()
+                entry = form.save(commit=False)
+                entry.user = request.user
+                if entry.save():
                     return JsonResponse({'success': 'true', 'entry_id': entry.id, 'user': entry.user.id})
+                else:
+                    return JsonResponse({'error': 'true', 'message': 'Day record already exists'})
 
             return JsonResponse({'success': False})
 
@@ -160,9 +157,10 @@ class NewRecordView(FormView):
     def delete(request):
         entry = Entry.objects.get(id=request.POST['entry_id'])
         if entry:
-            entry.deleted = True
-            entry.save()
-            messages.add_message(request, messages.SUCCESS, 'Record deleted successfully')
+            if entry.delete():
+                messages.add_message(request, messages.SUCCESS, 'Record deleted successfully')
+            else:
+                messages.add_message(request, messages.ERROR, 'Error deleting record')
         else:
             messages.add_message(request, messages.ERROR, 'Entry not found')
         return HttpResponseRedirect('/list')

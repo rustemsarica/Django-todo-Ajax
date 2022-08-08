@@ -33,4 +33,17 @@ class Entry(models.Model):
     def user__email(self):
         return self.user.email
     
+    def save(self):
+        entry = Entry.objects.filter(user=self.user, day=self.day, deleted=False)
+        if not entry:
+            super().save()
+        else:
+            return False
+        
+    def delete(self):
+        self.deleted = True
+        super().save()
+        return self.deleted
+        
+            
 
