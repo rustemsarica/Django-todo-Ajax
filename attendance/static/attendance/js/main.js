@@ -213,51 +213,26 @@ $(document).ready(function(){
     });
     multipleSelect();
 
-    function bootstrapSelect (refresh = "") {
-        $(".rstech-selectpicker").each(function (el) {
-            var $this = $(this);
-            if(!$this.parent().hasClass('bootstrap-select')){
-                var selected = $this.data('selected');
-                if( typeof selected !== 'undefined' ){
-                    $this.val(selected);
+    $('.table').DataTable({
+        "paging": true,
+        "lengthChange": true,
+        "searching": true,
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'excel',
+                text: 'Excel',
+                exportOptions: {
+                    modifier: {
+                        page: 'all'
+                    },
+                    columns: [0,1,2,3]
                 }
-                $this.selectpicker({
-                    size: 5,
-                    noneSelectedText: RSTech.local.nothing_selected,                     
-                    virtualScroll: false
-                });
             }
-            if (refresh === "refresh") {
-                $this.selectpicker("refresh");
-            }
-            if (refresh === "destroy") {
-                $this.selectpicker("destroy");
-            }
-        });
-    }
-    $(".rstech-table").each(function () {
-        var $this = $(this);
-
-        var empty = $this.data("empty");
-        empty = !empty ? 'nothing found' : empty;
-
-        $this.footable({
-            breakpoints: {
-                xs: 576,
-                sm: 768,
-                md: 992,
-                lg: 1200,
-                xl: 1400,
-            },
-            cascade: true,
-            on: {
-                "ready.ft.table": function (e, ft) {
-                    //RSTech.extra.deleteConfirm();
-                    bootstrapSelect("refresh");
-                },
-            },
-            empty: empty,
-        });
+        ],
+        "info": true,
+        "autoWidth": true,
+        "responsive": true,
     });
 });
 

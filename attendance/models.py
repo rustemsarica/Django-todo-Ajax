@@ -49,6 +49,19 @@ class Entry(models.Model):
     def super_delete(self):
         super().delete()
         return True
+
+    def update(self):
+        entry = Entry.objects.get(id=self.id)
+        if entry.day == self.day:
+            super().save()
+            return True
+        else:
+            entry = Entry.objects.filter(user=self.user, day=self.day, deleted=False).exists()
+            if entry:
+                return False
+            else:
+                super().save()
+                return True
         
             
 

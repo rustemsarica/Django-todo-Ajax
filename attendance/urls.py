@@ -13,7 +13,7 @@ urlpatterns = [
     path('record/add', NewRecordView.as_view(), name='newRecord'),
     path('record/update', NewRecordView.update, name='updateRecord'),
     path('record/delete', NewRecordView.delete, name='deleteRecord'),
-    path('record/ajax/add-record-row', NewRecordView.getForm),
+    path('record/ajax/add-record-row', NewRecordView.getForm, name='get_form'),
     path('record/ajax/save', NewRecordView.saveRecord),
     path('record/ajax/delete', NewRecordView.deleteRecord),
     path('record/ajax/update', NewRecordView.updateRecord),

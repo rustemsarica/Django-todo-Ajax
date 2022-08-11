@@ -65,9 +65,6 @@ class AttendeeList(ListView, FormView):
             entries = entries.all()
         entries = entries.order_by('-day')
         return render(request, 'attendance/entry_list.html', {'form': AttendeeListSearchForm(instance=request.GET), 'entries': entries})
-        #list_result = list(entries.values('id','user', 'user__username', 'note', 'day', 'working_hours'))
-        #return JsonResponse(list_result, safe=False)
-
 
 class NewRecordView(FormView):
 
@@ -77,7 +74,7 @@ class NewRecordView(FormView):
     success_url = '/'
 
     def getForm(request):
-        day = int(request.GET.get('day' or None))
+        day = int(request.GET.get('day') or 1)
         form = NewRecordForm
         new_date = datetime.today() + timedelta(days=day);
         ctx = {}
@@ -187,7 +184,6 @@ class LoginPage(View):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(username=username, password=password)
-
         if user is not None:
             if user.is_active:
                 login(request, user)
